@@ -5,6 +5,7 @@ from constraint import *
 path, contenedores, mapa = sys.argv
 mapa = open(mapa, "r").readlines()
 
+# Eliminar los espacios en blanco en el mapa
 for i, fila in enumerate(mapa):
     print(fila.strip())
     mapa[i] = fila.replace(" ", "")
@@ -41,18 +42,18 @@ def under(*args):
 
 
 def domain(contenedor, mapa):
-    list = []
+    domain = []
     if contenedor[2] == "S":
         for index_c, fila in enumerate(mapa):
             for index_f, elem in enumerate(fila):
                 if elem == "N" or elem == "E":
-                    list.append([index_c, index_f])
+                    domain.append([index_c, index_f])
     elif contenedor[2] == "R":
         for index_c, fila in enumerate(mapa):
             for index_f, elem in enumerate(fila):
                 if elem == "E":
-                    list.append([index_c, index_f])
-    return list
+                    domain.append([index_c, index_f])
+    return domain
 
 
 print(problem(mapa, contenedores)[0])
