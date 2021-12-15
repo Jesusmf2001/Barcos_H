@@ -20,7 +20,7 @@ def problem(mapa, contenedores):
         problem.addVariable(str(i +1), dominio)
         variables.append(str(i + 1))
     problem.addConstraint(notEqual, variables)
-
+    problem.addConstraint(under, variables)
     return problem.getSolutions()
 
 def notEqual(*args):
@@ -31,8 +31,14 @@ def notEqual(*args):
     return True
 
 def under(*args):
+
     for i in range(len(args)):
-        pass
+        for j in range(len(args)):
+            if i != j and args[i][0] == args[j][0] and args[i][1] == args[j][1]-1:
+                return True
+            elif mapa[args[i][0]][args[i][1] + 1] == "X":
+                return True
+    return False
 
 def domain(contenedor, mapa):
     list = []
@@ -47,5 +53,5 @@ def domain(contenedor, mapa):
                 if elem == "E":
                     list.append([index_f, index_c])
     return list
-print(problem(mapa, contenedores)[8])
-print(domain(contenedores[4], mapa))
+print(problem(mapa, contenedores)[15])
+#print(domain(contenedores[4], mapa))
