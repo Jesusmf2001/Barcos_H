@@ -17,11 +17,12 @@ def problem(mapa, contenedores):
     variables = []
     for i, contenedor in enumerate(contenedores):
         dominio = domain(contenedor, mapa)
-        problem.addVariable(str(i +1), dominio)
+        problem.addVariable(str(i + 1), dominio)
         variables.append(str(i + 1))
     problem.addConstraint(notEqual, variables)
     problem.addConstraint(under, variables)
     return problem.getSolutions()
+
 
 def notEqual(*args):
     for i in range(len(args)):
@@ -30,15 +31,14 @@ def notEqual(*args):
                 return False
     return True
 
-def under(*args):
 
+def under(*args):
     for i in range(len(args)):
         for j in range(len(args)):
-            if i != j and args[i][0] == args[j][0] and args[i][1] == args[j][1]-1:
-                return True
-            elif mapa[args[i][0]][args[i][1] + 1] == "X":
-                return True
-    return False
+            if (i != j) and (args[i][0] != args[j][0] or args[i][1] != args[j][1]-1) and (mapa[args[i][0]][args[i][1]+1] != "X"):
+                return False
+    return True
+
 
 def domain(contenedor, mapa):
     list = []
@@ -46,12 +46,14 @@ def domain(contenedor, mapa):
         for index_c, fila in enumerate(mapa):
             for index_f, elem in enumerate(fila):
                 if elem == "N" or elem == "E":
-                    list.append([index_f, index_c])
+                    list.append([index_c, index_f])
     elif contenedor[2] == "R":
         for index_c, fila in enumerate(mapa):
             for index_f, elem in enumerate(fila):
                 if elem == "E":
-                    list.append([index_f, index_c])
+                    list.append([index_c, index_f])
     return list
-print(problem(mapa, contenedores)[15])
-#print(domain(contenedores[4], mapa))
+
+
+print(problem(mapa, contenedores)[0])
+# print(domain(contenedores[4], mapa))
