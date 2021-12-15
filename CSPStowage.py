@@ -2,15 +2,15 @@ import sys
 
 from constraint import *
 
-path, contenedores, mapa = sys.argv
-mapa = open(mapa, "r").readlines()
+_, path, mapaNombre, contenedoresNombre = sys.argv
+mapa = open(path + '/' + mapaNombre + '.txt', "r").readlines()
 
 # Eliminar los espacios en blanco en el mapa
 for i, fila in enumerate(mapa):
-    print(fila.strip())
     mapa[i] = fila.replace(" ", "")
 
-contenedores = open(contenedores, "r").readlines()
+contenedores = open(path + '/' + contenedoresNombre + '.txt', "r").readlines()
+puertos = {contenedor[0]: int(contenedor[4]) for contenedor in contenedores}
 
 
 def problem(mapa, contenedores):
@@ -22,7 +22,44 @@ def problem(mapa, contenedores):
         variables.append(str(i + 1))
     problem.addConstraint(notEqual, variables)
     problem.addConstraint(under, variables)
-    return problem.getSolutions()
+    problem.addConstraint(notOn, variables)
+
+    sols = problem.getSolutions()
+
+    if len(sols) == 0:
+        problem.reset()
+        problem = Problem()
+        variables = []
+        for i, contenedor in enumerate(contenedores):
+            dominio = domain(contenedor, mapa)
+            problem.addVariable(str(i + 1), dominio)
+            variables.append(str(i + 1))
+        problem.addConstraint(notEqual, variables)
+        problem.addConstraint(under, variables)
+
+        sols = problem.getSolutions()
+
+    salida = open(f'{path}/{mapaNombre}-{contenedoresNombre}.output.txt', 'w')
+    salida.write(f'Numero de soluciones: {len(sols)}\n')
+    for sol in sols:
+        salida.write(str(sol) + '\n')
+
+    return sols
+
+
+def domain(contenedor, mapa):
+    domain = []
+    if contenedor[2] == "S":
+        for index_f, fila in enumerate(mapa):
+            for index_c, elem in enumerate(fila):
+                if elem == "N" or elem == "E":
+                    domain.append([index_c, index_f])
+    elif contenedor[2] == "R":
+        for index_f, fila in enumerate(mapa):
+            for index_c, elem in enumerate(fila):
+                if elem == "E":
+                    domain.append([index_c, index_f])
+    return domain
 
 
 def notEqual(*args):
@@ -34,13 +71,18 @@ def notEqual(*args):
 
 
 def under(*args):
+    valoresJefe = []
     for i in range(len(args)):
+        valores = []
         for j in range(len(args)):
             if i != j:
-                if mapa[args[i][1] + 1][args[i][0]] == "X":
+                try:
+                    if mapa[args[i][1] + 1][args[i][0]] == "X":
+                        valores.append(True)
+                    else:
+                        valores.append(args[i][0] == args[j][0] and args[i][1] == args[j][1] - 1)
+                except:
                     valores.append(True)
-                else:
-                    valores.append(args[i][0] == args[j][0] and args[i][1] == args[j][1] - 1)
         valoresJefe.append(any(valores))
     return all(valoresJefe)
 
