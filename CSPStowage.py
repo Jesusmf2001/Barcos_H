@@ -68,6 +68,3 @@ def printSol(sol):
         mat[sol[key][1]][sol[key][0]] = key
     for fila in mat:
         print(fila)
-
-
-printSol(problem(mapa, contenedores)[0])
