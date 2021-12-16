@@ -11,60 +11,45 @@ contenedores = [Contenedor(*contenedor.split(" ")) for contenedor in contenedore
 
 
 class AStar:
-    def __init__(self, mapa, contenedores, heuristica_n):
+    def __init__(self, mapa, contenedores):
         self.list = [False] * len(contenedores)
         self.mapa = mapa
         self.contenedores = contenedores
-        self.heuristica = self.calcHeuristica(heuristica_n)
         self.coste = 0
-
-    def calcHeuristica(self, heuristica_n=1):
-        cont_no_cargados = len(self.contenedores) - self.mapa.cargados()
-        cont_no_descargados = []
-        for contenedor in contenedores:
-            if not contenedor.descargado:
-                cont_no_descargados.append(contenedor)
-        if heuristica_n == 1:
-            return (cont_no_cargados * (10 + len(self.mapa))) + (
-                len(cont_no_descargados) * (15 + (2 * len(self.mapa)))) + (2 * 3500)
-
-    def getHeuristica(self):
-        return self.heuristica
-
-    def addCoste(self, add):
-        self.coste += add
-
-    def getCoste(self):
-        return self.coste
 
     def expand_node(self, node):
 
         if self.canExpandCharge():
             for contenedor in self.contenedores:
                 if not contenedor.cargado:
-                    charge_node, charge_cost = self.expandCharge(node, contenedor)
-                    node.hijos[charge_node] = charge_cost
-
+                    nodos = self.expandCharge(node, contenedor)
+                    for charge_node in nodos:
+                        node.hijos.append(charge_node)
         if self.canExpandDischarge():
             for contenedor in self.contenedores:
-                if not contenedor.descargado:
-                    discharge_node, discharge_cost = self.expandDischarge(node, contenedor)
-                    node.hijos[discharge_node] = discharge_cost
+                if not contenedor.descargado and contenedor.puerto == node.elem.puerto:
+                    nodo = self.expandDischarge(node, contenedor)
+                    node.hijos.append(nodo)
 
         if self.canExpandPort():
             list_h = self.expandPort(node)
             for node_h in list_h:
                 node.hijos[node_h] = 3500
+
         return node.hijos
 
     def canExpandCharge(self):
         return not (self.canExpandDischarge())
 
     def expandCharge(self, node, contenedor):
-        node_h = Node(node.elem, padre=node)
-        node_h.elem = node_h.elem.cargarContenedor(contenedor)
-        coste = node.costeCargar(contenedor)
-        return node_h, coste
+        nodos = []
+        posiciones = node.elem.dondeCargar(contenedor)
+        for pos in posiciones:
+            coste = node.elem.costeCargar(contenedor, pos[0], pos[1])
+            nodo = Node(node.elem, padre=node, coste=coste)
+            nodo.elem.cargarContenedor(pos[0], pos[1])
+            nodos.append(nodo)
+        return nodos
 
     def canExpandDischarge(self):
         return all(self.list)
@@ -79,15 +64,18 @@ class AStar:
         return self.mapa.puerto != 0 or all(self.list)
 
     def expandPort(self, node):
-        node_h = Node(node.elem, padre=node)
+
         list_h = []
-        if node_h.elem.puerto == 1:
+        if node.elem.puerto == 1:
+            node_h = Node(node.elem, padre=node)
             node_h.elem.puerto = 2
             list_h.append(node_h)
-        elif node_h.elem.puerto == 2:
+        elif node.elem.puerto == 2:
+            node_h = Node(node.elem, padre=node)
             node_h.elem.puerto = 1
             list_h.append(node_h)
-        elif node_h.elem.puerto == 0:
+        elif node.elem.puerto == 0:
+            node_h = Node(node.elem, padre=node)
             node_h.elem.puerto = 1
             list_h.append(node_h)
             node_h.elem.puerto = 2
@@ -97,19 +85,37 @@ class AStar:
     def findSolution(self):
         nodos = []
         raiz = Node(mapa)
-        self.expand_node(raiz)
-        for hijos in raiz.hijos:
-            nodos.append(hijos)
-
-
+        hijos = self.expand_node(raiz)
+        while True:
+            for hijo in hijos:
+                nodos.append(hijo)
+            nodeMin = min(nodos)
+            if nodeMin.heuristica == 0:
+                return True
+            else:
+                nodos.pop(nodeMin)
+                self.expand_node(nodeMin)
 
 class Node:
     def __init__(self, elem, padre=None):
         self.padre = padre
         self.elem = elem
-        self.hijos = {}
-        self.f = 0
-        if self.padre:
-            self.f += self.padre.f
+        self.hijos = []
+        self.coste = coste + (padre.coste if padre is not None else 0)
+        self.heuristica = self.calcHeursitica()
+        self.f = self.heuristica + self.coste
+
+    def calcHeursitica(self):
+        cont_no_cargados = len(self.elem.contenedores) - self.elem.cargados()
+        cont_no_descargados = []
+        for contenedor in self.elem.contenedores:
+            if not contenedor.descargado:
+                cont_no_descargados.append(contenedor)
+        return (cont_no_cargados * (10 + len(self.elem.mapa))) + (
+        len(cont_no_descargados) * (15 + (2 * len(self.elem.mapa)))) + ((2 - self.elem.viajes) * 3500)
+
+    def __gt__(self, other):
+        return self.f > other.f
 
 
+AStar(mapa, contenedores).findSolution()
