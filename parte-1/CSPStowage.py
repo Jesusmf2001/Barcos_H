@@ -105,8 +105,23 @@ def notOn(*args):
 def printSol(sol):
     columnas = len(mapa[0]) - 1
     filas = len(mapa)
+    m = []
+    for f in mapa:
+        m.append(f.split(" "))
+    posx = []
+    for col, fil in enumerate(m):
+        for f in fil:
+            cont = 0
+            for caca in f:
+                if caca == 'X':
+                    posx.append([cont, col])
+                cont += 1
     mat = [[" " for _ in range(columnas)] for _ in range(filas)]
+    for c, f in posx:
+        mat[f][c] = 'X'
     for key in sol.keys():
         mat[sol[key][1]][sol[key][0]] = key
     for fila in mat:
         print(fila)
+
+problem(mapa, contenedores)

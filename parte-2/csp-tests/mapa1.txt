@@ -1,0 +1,17 @@
+N N N N
+N N N N
+E N N E
+X 1 2 X
+X X X X
+
+N N N N
+N N N N
+E N N E
+X E 2 X
+X X X X
+
+N N N N
+N N N N
+E N N E
+X 1 E X
+X X X X

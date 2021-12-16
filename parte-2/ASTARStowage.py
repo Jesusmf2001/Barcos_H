@@ -18,7 +18,6 @@ class AStar:
         self.coste = 0
 
     def expand_node(self, node):
-
         if self.canExpandCharge():
             for contenedor in self.contenedores:
                 if not contenedor.cargado:
@@ -55,10 +54,9 @@ class AStar:
         return all(self.list)
 
     def expandDischarge(self, node, contenedor):
-        node_h = Node(node.elem, padre=node)
-        node_h.elem = node_h.elem.descargarContenedor(contenedor)
-        coste = node.elem.costeDescrgar(contenedor)
-        return node_h, coste
+        node.elem.descargarContenedor(contenedor)
+        nodo = Node(node.elem, padre=node, coste=node.elem.costeDescargar(contenedor))
+        return nodo
 
     def canExpandPort(self):
         return self.mapa.puerto != 0 or all(self.list)
@@ -96,8 +94,9 @@ class AStar:
                 nodos.pop(nodeMin)
                 self.expand_node(nodeMin)
 
+
 class Node:
-    def __init__(self, elem, padre=None):
+    def __init__(self, elem, padre=None, coste=0):
         self.padre = padre
         self.elem = elem
         self.hijos = []
