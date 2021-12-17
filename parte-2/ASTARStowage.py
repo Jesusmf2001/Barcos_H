@@ -44,9 +44,9 @@ class AStar:
         nodos = []
         posiciones = node.elem.dondeCargar(contenedor)
         for pos in posiciones:
-            coste = node.elem.costeCargar(contenedor, pos[0], pos[1])
+            coste = node.elem.costeCargar(pos[0])
             nodo = Node(node.elem, padre=node, coste=coste)
-            nodo.elem.cargarContenedor(pos[0], pos[1])
+            nodo.elem.cargarContenedor(contenedor, pos[0], pos[1])
             nodos.append(nodo)
         return nodos
 

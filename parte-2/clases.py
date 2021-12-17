@@ -47,17 +47,18 @@ class Mapa:
         for filaNum, fila in enumerate(self.mapa):
             for colNum, columna in enumerate(fila):
                 if self.sePuedeCargar(contenedor, filaNum, colNum):
-                    posiciones.append([fila, columna])
+                    posiciones.append([filaNum, colNum])
         return posiciones
 
     def sePuedeCargar(self, contenedor, fila, columna):
         if isinstance(self.mapaContenedores[fila][columna], Contenedor):
             return False
         try:
-            map_fc = self.mapaContenedores[fila + 1][columna]
+            mapa_fc = self.mapaContenedores[fila + 1][columna]
         except:
             mapa_fc = False
-        if isinstance(map_fc, Contenedor) or mapa_fc == 'X' or mapa_fc == False:
+
+        if isinstance(mapa_fc, Contenedor) or mapa_fc == 'X' or not mapa_fc:
             if contenedor.refrigerado:
                 return self.mapaContenedores[fila][columna] == 'E'
             else:
@@ -66,8 +67,8 @@ class Mapa:
     def costeDescargar(self, contenedor):
         return 15 + 2 * (contenedor.fila + 1)
 
-    def costeCargar(self, contenedor):
-        return 10 + contenedor.fila + 1
+    def costeCargar(self, fila):
+        return 10 + fila + 1
 
     def cargados(self):
         return len(list(filter(lambda contenedor: isinstance(contenedor, Contenedor), self.contenedores)))
