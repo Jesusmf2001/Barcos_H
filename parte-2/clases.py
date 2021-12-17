@@ -53,7 +53,11 @@ class Mapa:
     def sePuedeCargar(self, contenedor, fila, columna):
         if isinstance(self.mapaContenedores[fila][columna], Contenedor):
             return False
-        if isinstance(self.mapaContenedores[fila + 1][columna], Contenedor) or self.mapaContenedores[fila + 1][columna] == 'X':
+        try:
+            map_fc = self.mapaContenedores[fila + 1][columna]
+        except:
+            mapa_fc = False
+        if isinstance(map_fc, Contenedor) or mapa_fc == 'X' or mapa_fc == False:
             if contenedor.refrigerado:
                 return self.mapaContenedores[fila][columna] == 'E'
             else:
