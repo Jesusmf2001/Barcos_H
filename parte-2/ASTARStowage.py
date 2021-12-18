@@ -38,7 +38,7 @@ class AStar:
         return node.hijos
 
     def canExpandCharge(self):
-        return not (self.canExpandDischarge())
+        return len(list(filter(lambda contenedor: not contenedor.cargado, contenedores))) > 0
 
     def expandCharge(self, node, contenedor):
         nodos = []
@@ -48,10 +48,11 @@ class AStar:
             nodo = Node(node.elem, padre=node, coste=coste)
             nodo.elem.cargarContenedor(contenedor, pos[0], pos[1])
             nodos.append(nodo)
+            print(nodos)
         return nodos
 
     def canExpandDischarge(self):
-        return all(self.list)
+        return len(list(filter(lambda contenedor: not contenedor.descargado, contenedores))) > 0
 
     def expandDischarge(self, node, contenedor):
         node.elem.descargarContenedor(contenedor)
@@ -59,7 +60,7 @@ class AStar:
         return nodo
 
     def canExpandPort(self):
-        return self.mapa.puerto != 0 or all(self.list)
+        return self.mapa.puerto != 0# or all(self.list)
 
     def expandPort(self, node):
 
@@ -83,6 +84,7 @@ class AStar:
     def findSolution(self):
         nodos = []
         raiz = Node(mapa)
+        print(raiz)
         hijos = self.expand_node(raiz)
         while True:
             for hijo in hijos:
@@ -91,7 +93,9 @@ class AStar:
             if nodeMin.heuristica == 0:
                 return True
             else:
-                nodos.pop(nodeMin)
+                print(nodos, nodeMin)
+                nodos.remove(nodeMin)
+                print(nodos)
                 self.expand_node(nodeMin)
 
 
@@ -105,16 +109,20 @@ class Node:
         self.f = self.heuristica + self.coste
 
     def calcHeursitica(self):
-        cont_no_cargados = len(self.elem.contenedores) - self.elem.cargados()
-        cont_no_descargados = []
-        for contenedor in self.elem.contenedores:
-            if not contenedor.descargado:
-                cont_no_descargados.append(contenedor)
-        return (cont_no_cargados * (10 + len(self.elem.mapa))) + (
-        len(cont_no_descargados) * (15 + (2 * len(self.elem.mapa)))) + ((2 - self.elem.viajes) * 3500)
+        cont_no_cargados = len(list(filter(lambda contenedor: not contenedor.cargado, contenedores)))
+        cont_no_descargados = len(list(filter(lambda contenedor: not contenedor.descargado, contenedores)))
+        return (cont_no_cargados * (10 + len(self.elem.mapa))) + \
+               (cont_no_descargados * (15 + (2 * len(self.elem.mapa))))  # + ((2 - self.elem.viajes) * 3500)
 
     def __gt__(self, other):
         return self.f > other.f
+
+    def __repr__(self):
+        return str(self.heuristica)
+
+    def __eq__(self, other):
+        return self.f == other.f
+
 
 
 AStar(mapa, contenedores).findSolution()

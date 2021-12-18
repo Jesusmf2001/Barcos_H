@@ -26,7 +26,7 @@ class Mapa:
         self.contenedores = []
         self.puerto = 0
         self.viajes = 0
-        self.mapaContenedores = mapa.copy()
+        self.mapaContenedores = self.mapa.copy()
 
     def cargarContenedor(self, contenedor, fila, columna):
         self.contenedores.append(contenedor)
@@ -40,7 +40,7 @@ class Mapa:
         self.mapaContenedores[contenedor.fila][contenedor.columna] = None
         contenedor.fila = None
         contenedor.columna = None
-        contenedor.cargado = False
+        contenedor.descargado = True
 
     def dondeCargar(self, contenedor):
         posiciones = []
