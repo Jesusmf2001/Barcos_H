@@ -71,19 +71,25 @@ class AStar:
         # Devuelvve la lista de nodos
 
     def canExpandDischarge(self, node):
+        """Devuelve true si es posible expandir descargando contenedores"""
         return len(list(filter(lambda contenedor: not contenedor.descargado, node.elem.contenedores))) > 0
 
     def expandDischarge(self, node, contenedor):
+        """Expande los nodos descargando los contenedores"""
         node.elem.descargarContenedor(contenedor)
         nodo = Node(node.elem, padre=node, coste=node.elem.costeDescargar(contenedor))
         return nodo
 
     def canExpandPort(self, node):
+        """Devuelve True si es posible expandir el puerto dado un nodo"""
         return self.mapa.puerto != 0 or all(
             list(filter(lambda contenedor: not contenedor.cargado, node.elem.contenedores)))
 
     def expandPort(self, node):
-
+        """
+            Expande los nodos moviendo el barco de un puerto a otro. En nuestro caso el barco es el propio mapa
+            que tiene como atributo el puerto en el que se encuentra
+        """
         list_h = []
         if node.elem.puerto == 1:
             node_h = Node(node.elem, padre=node)
@@ -102,6 +108,9 @@ class AStar:
         return list_h
 
     def findSolution(self):
+        """Método principal incialmente se crea el nodo con el estado inicial y luego se entra en un bucle que solo acaba
+        cuando algún hijo consigue la heurística 0.
+        """
         nodos = []
         raiz = Node(mapa)
 
@@ -110,18 +119,24 @@ class AStar:
             for hijo in hijos:
                 nodos.append(hijo)
             nodeMin = min(nodos)
-            print(nodeMin.elem)
             if nodeMin.heuristica == 0:
+                # Si la heuristica es 0 hemos terminado
                 return True
             else:
+                # Eliminamos el nodo con menor heuristica para dejar de compararlo y lo expandimos.
                 nodos.remove(nodeMin)
                 hijos = self.expand_node(nodeMin)
 
 
 class Node:
     def __init__(self, elem, padre=None, coste=0):
+        """
+            Reresenta un nodo, contiene el un mapa y unos hijos resultantes de la expansión de este.
+            Además es posible calcular la heuristica aquí.
+        """
         self.padre = padre
         if self.padre is not None:
+            # Definimos una id para los nodos para que sea facil identificarlos y borrarlos después
             self.id = self.padre.id + 1
         else:
             self.id = 0
@@ -132,6 +147,8 @@ class Node:
         self.f = self.heuristica + self.coste
 
     def calcHeursitica(self):
+        """Calcula la heuristica dependiendo del valor pasado como argumento, si este valor
+        es 1 calculamos en base a la primera heuristica, si es dos en base a la segunda"""
         cont_no_cargados = len(list(filter(lambda contenedor: not contenedor.cargado, contenedores)))
         cont_no_descargados = len(list(filter(lambda contenedor: not contenedor.descargado, contenedores)))
         if heuristica == 1:
