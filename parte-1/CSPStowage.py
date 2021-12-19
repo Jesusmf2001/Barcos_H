@@ -10,6 +10,8 @@ for i, fila in enumerate(mapa):
     mapa[i] = fila.replace(" ", "")
 
 contenedores = open(path + '/' + contenedoresNombre + '.txt', "r").readlines()
+#  Obtenemos un diccionario en el que asignamos pares contenedor: puerto.
+#  En contenedor[0] se encuentra la ID y en contenedor[4] en número de puerto
 puertos = {contenedor[0]: int(contenedor[4]) for contenedor in contenedores}
 
 
@@ -28,7 +30,6 @@ def problem(mapa, contenedores):
 
     if len(sols) == 0:
         problem.reset()
-        problem = Problem()
         variables = []
         for i, contenedor in enumerate(contenedores):
             dominio = domain(contenedor, mapa)
@@ -124,4 +125,5 @@ def printSol(sol):
     for fila in mat:
         print(fila)
 
-problem(mapa, contenedores)
+
+sols = problem(mapa, contenedores)
