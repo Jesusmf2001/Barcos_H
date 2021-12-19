@@ -21,9 +21,9 @@ class Contenedor:
 
 
 class Mapa:
-    def __init__(self, mapa):
+    def __init__(self, mapa, contenedores):
         self.mapa = [fila.split(" ") for fila in mapa]
-        self.contenedores = []
+        self.contenedores = contenedores
         self.puerto = 0
         self.viajes = 0
         self.mapaContenedores = self.mapa.copy()

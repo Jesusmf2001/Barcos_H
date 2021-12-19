@@ -3,28 +3,28 @@ from clases import Mapa, Contenedor
 
 _, path, mapaNombre, contenedoresNombre, heuristica = sys.argv
 
-mapa = open(path + '/' + mapaNombre + '.txt', "r").readlines()
-mapa = Mapa(mapa)
-
 contenedores = open(path + '/' + contenedoresNombre + '.txt', "r").readlines()
 contenedores = [Contenedor(*contenedor.split(" ")) for contenedor in contenedores]
-
+mapa = open(path + '/' + mapaNombre + '.txt', "r").readlines()
+mapa = Mapa(mapa, contenedores)
 
 class AStar:
     def __init__(self, mapa, contenedores):
         self.list = [False] * len(contenedores)
         self.mapa = mapa
         self.contenedores = contenedores
-        self.coste = 0
+
 
     def expand_node(self, node):
-        if self.canExpandCharge():
-            for contenedor in self.contenedores:
+        if self.canExpandCharge(node):
+            print(1)
+            for contenedor in node.elem.contenedores:
                 if not contenedor.cargado:
                     nodos = self.expandCharge(node, contenedor)
+                    print(nodos)
                     for charge_node in nodos:
                         node.hijos.append(charge_node)
-        if self.canExpandDischarge():
+        if self.canExpandDischarge(node):
             for contenedor in self.contenedores:
                 if not contenedor.descargado and contenedor.puerto == node.elem.puerto:
                     nodo = self.expandDischarge(node, contenedor)
@@ -37,8 +37,8 @@ class AStar:
 
         return node.hijos
 
-    def canExpandCharge(self):
-        return len(list(filter(lambda contenedor: not contenedor.cargado, contenedores))) > 0
+    def canExpandCharge(self, node):
+        return len(list(filter(lambda contenedor: not contenedor.cargado, node.elem.contenedores))) > 0
 
     def expandCharge(self, node, contenedor):
         nodos = []
@@ -48,11 +48,11 @@ class AStar:
             nodo = Node(node.elem, padre=node, coste=coste)
             nodo.elem.cargarContenedor(contenedor, pos[0], pos[1])
             nodos.append(nodo)
-            print(nodos)
+
         return nodos
 
-    def canExpandDischarge(self):
-        return len(list(filter(lambda contenedor: not contenedor.descargado, contenedores))) > 0
+    def canExpandDischarge(self, node):
+        return len(list(filter(lambda contenedor: not contenedor.descargado, node.elem.contenedores))) > 0
 
     def expandDischarge(self, node, contenedor):
         node.elem.descargarContenedor(contenedor)
@@ -84,24 +84,27 @@ class AStar:
     def findSolution(self):
         nodos = []
         raiz = Node(mapa)
-        print(raiz)
+
         hijos = self.expand_node(raiz)
         while True:
             for hijo in hijos:
                 nodos.append(hijo)
             nodeMin = min(nodos)
+            print(nodeMin.elem)
             if nodeMin.heuristica == 0:
                 return True
             else:
-                print(nodos, nodeMin)
                 nodos.remove(nodeMin)
-                print(nodos)
-                self.expand_node(nodeMin)
+                hijos = self.expand_node(nodeMin)
 
 
 class Node:
     def __init__(self, elem, padre=None, coste=0):
         self.padre = padre
+        if self.padre is not None:
+            self.id = self.padre.id + 1
+        else:
+            self.id = 0
         self.elem = elem
         self.hijos = []
         self.coste = coste + (padre.coste if padre is not None else 0)
@@ -117,11 +120,11 @@ class Node:
     def __gt__(self, other):
         return self.f > other.f
 
-    def __repr__(self):
-        return str(self.heuristica)
+    def __lt__(self, other):
+        return self.f < other.f
 
-    def __eq__(self, other):
-        return self.f == other.f
+    def __repr__(self):
+        return str(self.f)
 
 
 
