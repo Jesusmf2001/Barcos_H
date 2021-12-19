@@ -4,6 +4,10 @@ _, path, mapaNombre, contenedoresNombre, heuristica = sys.argv
 
 
 class Contenedor:
+    """
+        Representa un contenedor, con una id, un puerto, una posición y buleanos
+        representando su estado.
+    """
     def __init__(self, id, tipo, puerto):
         self.id = id
         self.refrigerado = True if tipo == "R" else False
@@ -21,6 +25,10 @@ class Contenedor:
 
 
 class Mapa:
+    """
+        Representa un mapa. Este contiene la información de las diferentes celdas y los diferentes
+        contenedores que contiene. Ademas provee métodos utiles para añddir contenedores y calcular costes.
+    """
     def __init__(self, mapa, contenedores):
         self.mapa = [fila.split(" ") for fila in mapa]
         self.contenedores = contenedores

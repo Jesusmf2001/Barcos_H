@@ -14,7 +14,6 @@ class AStar:
         self.mapa = mapa
         self.contenedores = contenedores
 
-
     def expand_node(self, node):
         if self.canExpandCharge(node):
             print(1)
@@ -30,10 +29,10 @@ class AStar:
                     nodo = self.expandDischarge(node, contenedor)
                     node.hijos.append(nodo)
 
-        if self.canExpandPort():
+        if self.canExpandPort(node):
             list_h = self.expandPort(node)
             for node_h in list_h:
-                node.hijos.append(node_h, padre= node, coste= 3500)
+                node.hijos.append(node_h, padre=node, coste=3500)
 
         return node.hijos
 
@@ -59,8 +58,9 @@ class AStar:
         nodo = Node(node.elem, padre=node, coste=node.elem.costeDescargar(contenedor))
         return nodo
 
-    def canExpandPort(self):
-        return self.mapa.puerto != 0 or all(list(filter(lambda contenedor: not contenedor.cargado, node.elem.contenedores)))
+    def canExpandPort(self, node):
+        return self.mapa.puerto != 0 or all(
+            list(filter(lambda contenedor: not contenedor.cargado, node.elem.contenedores)))
 
     def expandPort(self, node):
 
@@ -114,8 +114,11 @@ class Node:
     def calcHeursitica(self):
         cont_no_cargados = len(list(filter(lambda contenedor: not contenedor.cargado, contenedores)))
         cont_no_descargados = len(list(filter(lambda contenedor: not contenedor.descargado, contenedores)))
-        return (cont_no_cargados * (10 + len(self.elem.mapa))) + \
-               (cont_no_descargados * (15 + (2 * len(self.elem.mapa)))) + ((2 - self.elem.viajes) * 3500)
+        if heuristica == 1:
+            return (cont_no_cargados * (10 + len(self.elem.mapa))) + \
+                   (cont_no_descargados * (15 + (2 * len(self.elem.mapa)))) + ((2 - self.elem.viajes) * 3500)
+        else:
+            return (cont_no_cargados * (10 + len(self.elem.mapa))) + ((2 - self.elem.viajes) * 3500)
 
     def __gt__(self, other):
         return self.f > other.f
@@ -125,5 +128,6 @@ class Node:
 
     def __repr__(self):
         return str(self.f)
+
 
 AStar(mapa, contenedores).findSolution()
