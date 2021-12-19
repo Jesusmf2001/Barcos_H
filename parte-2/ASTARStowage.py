@@ -33,7 +33,7 @@ class AStar:
         if self.canExpandPort():
             list_h = self.expandPort(node)
             for node_h in list_h:
-                node.hijos[node_h] = 3500
+                node.hijos.append(node_h, padre= node, coste= 3500)
 
         return node.hijos
 
@@ -60,7 +60,7 @@ class AStar:
         return nodo
 
     def canExpandPort(self):
-        return self.mapa.puerto != 0  # or all(self.list)
+        return self.mapa.puerto != 0 or all(list(filter(lambda contenedor: not contenedor.cargado, node.elem.contenedores)))
 
     def expandPort(self, node):
 
