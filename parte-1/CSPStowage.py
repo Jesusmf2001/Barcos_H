@@ -124,4 +124,5 @@ def printSol(sol):
     for fila in mat:
         print(fila)
 
+
 problem(mapa, contenedores)

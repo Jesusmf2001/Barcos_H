@@ -8,9 +8,9 @@ contenedores = [Contenedor(*contenedor.split(" ")) for contenedor in contenedore
 mapa = open(path + '/' + mapaNombre + '.txt', "r").readlines()
 mapa = Mapa(mapa, contenedores)
 
+
 class AStar:
     def __init__(self, mapa, contenedores):
-        self.list = [False] * len(contenedores)
         self.mapa = mapa
         self.contenedores = contenedores
 
@@ -60,7 +60,7 @@ class AStar:
         return nodo
 
     def canExpandPort(self):
-        return self.mapa.puerto != 0# or all(self.list)
+        return self.mapa.puerto != 0  # or all(self.list)
 
     def expandPort(self, node):
 
@@ -125,7 +125,6 @@ class Node:
 
     def __repr__(self):
         return str(self.f)
-
 
 
 AStar(mapa, contenedores).findSolution()

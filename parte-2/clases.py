@@ -14,7 +14,7 @@ class Contenedor:
         self.fila = None
 
     def __repr__(self):
-        return f'ID: {self.id}, REFRIGERADO: {self.refrigerado}, PUERTO: {self.puerto}'
+        return f'ID: {self.id}; REFRIGERADO: {self.refrigerado}; PUERTO: {self.puerto}; CARGADO: {self.cargado}'
 
     def __eq__(self, other):
         return self.id == other.id
@@ -29,11 +29,12 @@ class Mapa:
         self.mapaContenedores = self.mapa.copy()
 
     def cargarContenedor(self, contenedor, fila, columna):
-        self.contenedores.append(contenedor)
-        self.mapaContenedores[fila][columna] = contenedor
-        contenedor.fila = fila
-        contenedor.columna = columna
-        contenedor.cargado = True
+        if not contenedor.cargado:
+            self.contenedores.append(contenedor)
+            self.mapaContenedores[fila][columna] = contenedor
+            contenedor.fila = fila
+            contenedor.columna = columna
+            contenedor.cargado = True
 
     def descargarContenedor(self, contenedor):
         self.contenedores.remove(contenedor)
@@ -71,7 +72,10 @@ class Mapa:
         return 10 + fila + 1
 
     def cargados(self):
-        return len(list(filter(lambda contenedor: isinstance(contenedor, Contenedor), self.contenedores)))
+        return len(list(filter(lambda contenedor: isinstance(contenedor, Contenedor), self.mapaContenedores)))
 
     def __repr__(self):
         return str(self.mapa)
+
+    def __eq__(self, other):
+        return self.mapaContenedores == other.mapaContenedores
