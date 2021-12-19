@@ -10,13 +10,20 @@ mapa = Mapa(mapa, contenedores)
 
 
 class AStar:
+    """
+        Clase que implementa el algoritmo A estrella
+    """
     def __init__(self, mapa, contenedores):
         self.mapa = mapa
         self.contenedores = contenedores
 
     def expand_node(self, node):
+        """
+         Expande el nodo recibido según las posibilidades que este tiene
+        """
         if self.canExpandCharge(node):
-            print(1)
+            # Si puede expandir nodos de cargar contenedores entra en el condicionante e
+            # introduce en el valor de hijos del nodo todas las posibilidades
             for contenedor in node.elem.contenedores:
                 if not contenedor.cargado:
                     nodos = self.expandCharge(node, contenedor)
@@ -24,31 +31,44 @@ class AStar:
                     for charge_node in nodos:
                         node.hijos.append(charge_node)
         if self.canExpandDischarge(node):
+            # Si puede descargar, siguiendo las normas, uno o más contenedores, crea un nodo
+            # por cada uno de estos contenedores y los añade a los hijos de nodo
             for contenedor in self.contenedores:
                 if not contenedor.descargado and contenedor.puerto == node.elem.puerto:
                     nodo = self.expandDischarge(node, contenedor)
                     node.hijos.append(nodo)
 
         if self.canExpandPort(node):
+            # Si puede moverse correctamente de un puerto a otro, crea dicho nodo y lo añade como hijo
             list_h = self.expandPort(node)
             for node_h in list_h:
                 node.hijos.append(node_h, padre=node, coste=3500)
 
         return node.hijos
+        # Devuelve todos los hijos que ha creado para luego compararlos
 
     def canExpandCharge(self, node):
+        """
+            Devuelve "True" si queda algún contenedor que no ha sido cargado
+        """
         return len(list(filter(lambda contenedor: not contenedor.cargado, node.elem.contenedores))) > 0
 
     def expandCharge(self, node, contenedor):
+        """ Devuelve una lista de nodos creados a partir de el nodo recibido y el contenedor en el
+        que coloca el contendor en las posibles opciones"""
         nodos = []
         posiciones = node.elem.dondeCargar(contenedor)
+        # Almacena todas las posiciones en las que se puede colocar el contenedor
         for pos in posiciones:
+            # Crea nodos para cada posicion posible
             coste = node.elem.costeCargar(pos[0])
             nodo = Node(node.elem, padre=node, coste=coste)
             nodo.elem.cargarContenedor(contenedor, pos[0], pos[1])
             nodos.append(nodo)
+            # Se añade cada nodo creado a la lista
 
         return nodos
+        # Devuelvve la lista de nodos
 
     def canExpandDischarge(self, node):
         return len(list(filter(lambda contenedor: not contenedor.descargado, node.elem.contenedores))) > 0
