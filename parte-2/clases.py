@@ -29,6 +29,7 @@ class Mapa:
         Representa un mapa. Este contiene la información de las diferentes celdas y los diferentes
         contenedores que contiene. Ademas provee métodos utiles para añddir contenedores y calcular costes.
     """
+
     def __init__(self, mapa, contenedores):
         self.mapa = [fila.split(" ") for fila in mapa]
         self.contenedores = contenedores
@@ -52,6 +53,9 @@ class Mapa:
         contenedor.descargado = True
 
     def dondeCargar(self, contenedor):
+        """
+            Devuelve un array de posiciones en las que es posible cargar un contenedor
+        """
         posiciones = []
         for filaNum, fila in enumerate(self.mapa):
             for colNum, columna in enumerate(fila):
@@ -60,9 +64,13 @@ class Mapa:
         return posiciones
 
     def sePuedeCargar(self, contenedor, fila, columna):
+        """
+            Comprueba si es posible cargar un contenedor en una determinada posición
+        """
         if isinstance(self.mapaContenedores[fila][columna], Contenedor):
             return False
         try:
+            # Try ya que podriamos estar comprobando una posición out of index
             mapa_fc = self.mapaContenedores[fila + 1][columna]
         except:
             mapa_fc = False
@@ -80,6 +88,9 @@ class Mapa:
         return 10 + fila + 1
 
     def cargados(self):
+        """
+            Devuelve el número de contenedores cargados filtrando la lista por los elementos que son de tipo contenedor
+        """
         return len(list(filter(lambda contenedor: isinstance(contenedor, Contenedor), self.mapaContenedores)))
 
     def __repr__(self):
