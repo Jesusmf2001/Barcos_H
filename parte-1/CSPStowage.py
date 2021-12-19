@@ -113,8 +113,8 @@ def printSol(sol):
     for col, fil in enumerate(m):
         for f in fil:
             cont = 0
-            for caca in f:
-                if caca == 'X':
+            for elem in f:
+                if elem == 'X':
                     posx.append([cont, col])
                 cont += 1
     mat = [[" " for _ in range(columnas)] for _ in range(filas)]
