@@ -115,7 +115,7 @@ class Node:
         cont_no_cargados = len(list(filter(lambda contenedor: not contenedor.cargado, contenedores)))
         cont_no_descargados = len(list(filter(lambda contenedor: not contenedor.descargado, contenedores)))
         return (cont_no_cargados * (10 + len(self.elem.mapa))) + \
-               (cont_no_descargados * (15 + (2 * len(self.elem.mapa))))  # + ((2 - self.elem.viajes) * 3500)
+               (cont_no_descargados * (15 + (2 * len(self.elem.mapa)))) + ((2 - self.elem.viajes) * 3500)
 
     def __gt__(self, other):
         return self.f > other.f
@@ -125,6 +125,5 @@ class Node:
 
     def __repr__(self):
         return str(self.f)
-
 
 AStar(mapa, contenedores).findSolution()
